@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Dongjae Hub is a professional static website with a responsive Games section and a playable snake game.">
+    <meta name="theme-color" content="#0f1115">
+    <title>Dongjae Hub</title>
+    <link rel="stylesheet" href="styles.css">
+    <script type="module" src="script.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#content">Skip to content</a>
+
+    <header class="site-header" data-nav-open="false">
+      <a class="brand" href="#home" aria-label="Dongjae Hub home">
+        <span class="brand-mark">DH</span>
+        <span class="brand-text">Dongjae Hub</span>
+      </a>
+
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">
+        Menu
+      </button>
+
+      <nav class="primary-nav" id="primary-nav" aria-label="Primary">
+        <a href="#home" aria-current="page">Home</a>
+        <a href="#about">About</a>
+        <a href="#projects">Projects</a>
+        <a href="#experience">Experience</a>
+        <a href="#research">Research</a>
+        <a href="#games">Games</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </header>
+
+    <main id="content">
+      <section id="home" class="hero section">
+        <div class="hero-copy">
+          <p class="eyebrow">Professional website</p>
+          <h1>Build a calm, responsive home for work, ideas, and play.</h1>
+          <p class="lede">
+            This site is intentionally static, fast, and friendly to GitHub Pages.
+            Verified profile content can be inserted later without changing the structure.
+          </p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#projects">View projects</a>
+            <a class="button button-secondary" href="#games">Open games</a>
+          </div>
+        </div>
+
+        <div class="hero-panel" aria-hidden="true">
+          <article class="panel-card">
+            <span>Stack</span>
+            <strong>HTML • CSS • JavaScript</strong>
+          </article>
+          <article class="panel-card">
+            <span>Surface</span>
+            <strong>Responsive, static, accessible</strong>
+          </article>
+          <article class="panel-card">
+            <span>Status</span>
+            <strong>Ready for profile content [사람 확인 필요]</strong>
+          </article>
+        </div>
+      </section>
+
+      <section id="about" class="section split-section">
+        <div class="section-heading">
+          <p class="eyebrow">About</p>
+          <h2>Professional profile</h2>
+        </div>
+        <div class="split-content card-surface">
+          <p>
+            Add a verified biography, strengths, and focus areas here.
+            [사람 확인 필요]
+          </p>
+          <p>
+            This layout keeps the content modular so the site can evolve without a rewrite.
+          </p>
+        </div>
+      </section>
+
+      <section id="projects" class="section">
+        <div class="section-heading">
+          <p class="eyebrow">Projects</p>
+          <h2>Selected work</h2>
+        </div>
+        <div class="card-grid">
+          <article class="info-card">
+            <span>01</span>
+            <h3>Project overview</h3>
+            <p>Placeholder for a verified project description. [사람 확인 필요]</p>
+          </article>
+          <article class="info-card">
+            <span>02</span>
+            <h3>Portfolio case</h3>
+            <p>Placeholder for a second portfolio item. [사람 확인 필요]</p>
+          </article>
+          <article class="info-card">
+            <span>03</span>
+            <h3>Public link</h3>
+            <p>Placeholder for a public repository or production link. [사람 확인 필요]</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="experience" class="section">
+        <div class="section-heading">
+          <p class="eyebrow">Experience</p>
+          <h2>Work history</h2>
+        </div>
+        <div class="timeline card-surface">
+          <article>
+            <h3>Current role</h3>
+            <p>[사람 확인 필요] Add the current role, employer, and summary.</p>
+          </article>
+          <article>
+            <h3>Previous role</h3>
+            <p>[사람 확인 필요] Add the previous role and measurable outcomes.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="research" class="section">
+        <div class="section-heading">
+          <p class="eyebrow">Research</p>
+          <h2>Thinking and experiments</h2>
+        </div>
+        <div class="research-grid">
+          <article class="info-card">
+            <span>01</span>
+            <h3>Systems thinking</h3>
+            <p>Describe practical design principles or technical interests here. [사람 확인 필요]</p>
+          </article>
+          <article class="info-card">
+            <span>02</span>
+            <h3>Experiment log</h3>
+            <p>Describe a research direction or learning track here. [사람 확인 필요]</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="games" class="section games-section">
+        <div class="section-heading">
+          <p class="eyebrow">Games</p>
+          <h2>Loop Snake</h2>
+        </div>
+
+        <div class="games-layout">
+          <div class="games-copy card-surface">
+            <p>
+              Use arrow keys, WASD, swipe, or the on-screen controls.
+              The game is intentionally self-contained and static.
+            </p>
+            <div class="scoreboard" aria-label="Snake scores">
+              <div>
+                <span>Score</span>
+                <strong id="game-score">00</strong>
+              </div>
+              <div>
+                <span>Best</span>
+                <strong id="game-best">00</strong>
+              </div>
+            </div>
+            <div class="game-actions">
+              <button id="game-start" class="button button-primary" type="button">Start</button>
+              <button id="game-restart" class="button button-secondary" type="button">Restart</button>
+            </div>
+            <p class="game-help"><strong>Keyboard:</strong> Arrow keys or WASD<br><strong>Touch:</strong> Swipe the board or use the direction buttons</p>
+            <p id="game-status" class="game-status" aria-live="polite">Ready. Press Start or move once to begin.</p>
+          </div>
+
+          <div class="game-stage card-surface" aria-label="Loop Snake game stage">
+            <canvas
+              id="snake-board"
+              width="640"
+              height="640"
+              tabindex="0"
+              role="img"
+              aria-label="Snake game board. Use arrow keys, WASD, swipe, or direction buttons to move."
+            ></canvas>
+
+            <div class="touch-controls" aria-label="Touch direction controls">
+              <button type="button" data-direction="up" aria-label="Move up">▲</button>
+              <button type="button" data-direction="left" aria-label="Move left">◀</button>
+              <button type="button" data-direction="down" aria-label="Move down">▼</button>
+              <button type="button" data-direction="right" aria-label="Move right">▶</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="contact" class="section contact-section">
+        <div class="section-heading">
+          <p class="eyebrow">Contact</p>
+          <h2>Stay in touch</h2>
+        </div>
+        <div class="contact-grid">
+          <a class="contact-link" href="https://github.com/dongjae-hub">GitHub</a>
+          <a class="contact-link" href="#home">Profile details [사람 확인 필요]</a>
+          <a class="contact-link" href="#games">Play Loop Snake</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>Dongjae Hub</span>
+      <span>Static • Responsive • Playable</span>
+      <span>© <span data-year></span> [사람 확인 필요]</span>
+    </footer>
+  </body>
+</html>
