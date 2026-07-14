@@ -11,16 +11,34 @@
 
 ## Current State
 
-- 현재 상태: `DEPLOYED`
-- 완료한 루프: 6
-- 완료 루프 요약: 정적 웹사이트, 반응형 레이아웃, 지렁이 게임 코어, 테스트, 빌드, 배포, 사용자 수정 요청 반영, 로컬 검증, 재배포
-- 다음 루프: [사람 확인 필요] 추가 수정 또는 후속 검수
+- 현재 상태: `DEPLOY_APPROVAL_REQUIRED`
+- 완료한 루프: 7
+- 완료 루프 요약: 정적 웹사이트, 반응형 레이아웃, 지렁이 게임 코어, 테스트, 빌드, 배포, 사용자 수정 요청 반영, 로컬 검증, 재배포, 후속 모바일/푸터 수정
+- 다음 루프: [사람 확인 필요] 재배포 승인 또는 추가 검수
 - 현재 Retry 횟수: 0
 - 현재 오류 fingerprint: 없음
-- Blocker: 없음
+- Blocker: 배포 승인 대기
 - 마지막 정상 상태: `DEPLOYED`
 
 ## Execution Log
+
+```text
+Loop ID: 7
+시작 시각: [사람 확인 필요]
+목표: 모바일에서 지렁이가 보이지 않는 문제와 footer 문구를 수정
+시작 상태: DEPLOYED
+가설: 캔버스 원형 사각형 호환성 보강과 footer 텍스트 정리로 두 문제를 함께 해결할 수 있다
+Act: roundRect 폴백을 추가하고 footer의 사람 확인 문구를 제거했다
+변경 파일: game.js, index.html, tests/site.test.mjs, CHANGE_REQUEST.md, MEMORY.md
+Verifier: `cmd /c npm test`, `cmd /c npm run build`, 로컬 HTTP 서버 + `curl.exe`
+테스트 결과: PASS
+exit code: 0
+오류 fingerprint: 없음
+Retry 횟수: 0
+종료 상태: DEPLOY_APPROVAL_REQUIRED
+다음 작업: 재배포 승인 요청
+사람 확인 필요 항목: 실제 모바일 브라우저에서의 시각 확인, 사용자 재배포 승인 여부
+```
 
 ```text
 Loop ID: 6

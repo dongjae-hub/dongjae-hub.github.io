@@ -304,7 +304,24 @@ function drawBoard(context, state) {
     const pad = Math.max(1.5, cell * 0.16);
     context.fillStyle = "#ffcf6f";
     context.beginPath();
-    context.roundRect(state.enemy.x * cell + pad, state.enemy.y * cell + pad, cell - pad * 2, cell - pad * 2, cell * 0.22);
+    if (typeof context.roundRect === "function") {
+      context.roundRect(state.enemy.x * cell + pad, state.enemy.y * cell + pad, cell - pad * 2, cell - pad * 2, cell * 0.22);
+    } else {
+      const x = state.enemy.x * cell + pad;
+      const y = state.enemy.y * cell + pad;
+      const width = cell - pad * 2;
+      const height = cell - pad * 2;
+      const radius = Math.min(cell * 0.22, width / 2, height / 2);
+      context.moveTo(x + radius, y);
+      context.lineTo(x + width - radius, y);
+      context.quadraticCurveTo(x + width, y, x + width, y + radius);
+      context.lineTo(x + width, y + height - radius);
+      context.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      context.lineTo(x + radius, y + height);
+      context.quadraticCurveTo(x, y + height, x, y + height - radius);
+      context.lineTo(x, y + radius);
+      context.quadraticCurveTo(x, y, x + radius, y);
+    }
     context.fill();
   }
 
@@ -312,7 +329,24 @@ function drawBoard(context, state) {
     const pad = Math.max(1.5, cell * 0.12);
     context.fillStyle = index === 0 ? "#efffc8" : "#8fd3ff";
     context.beginPath();
-    context.roundRect(segment.x * cell + pad, segment.y * cell + pad, cell - pad * 2, cell - pad * 2, cell * 0.22);
+    if (typeof context.roundRect === "function") {
+      context.roundRect(segment.x * cell + pad, segment.y * cell + pad, cell - pad * 2, cell - pad * 2, cell * 0.22);
+    } else {
+      const x = segment.x * cell + pad;
+      const y = segment.y * cell + pad;
+      const width = cell - pad * 2;
+      const height = cell - pad * 2;
+      const radius = Math.min(cell * 0.22, width / 2, height / 2);
+      context.moveTo(x + radius, y);
+      context.lineTo(x + width - radius, y);
+      context.quadraticCurveTo(x + width, y, x + width, y + radius);
+      context.lineTo(x + width, y + height - radius);
+      context.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      context.lineTo(x + radius, y + height);
+      context.quadraticCurveTo(x, y + height, x, y + height - radius);
+      context.lineTo(x, y + radius);
+      context.quadraticCurveTo(x, y, x + radius, y);
+    }
     context.fill();
   });
 }

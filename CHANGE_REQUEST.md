@@ -6,7 +6,7 @@
 
 ## Current Status
 
-`DEPLOYED`
+`DEPLOY_APPROVAL_REQUIRED`
 
 ## Baseline
 
@@ -533,8 +533,17 @@ Previous role : 허접한 개발자
 - Retry 횟수: 0
 - Claude Code CLI 사용 여부: 시도했으나 API 연결 실패
 - 실제 사용한 Claude 모델: [사람 확인 필요]
-- 현재 상태: `DEPLOYED`
+- 현재 상태: `DEPLOY_APPROVAL_REQUIRED`
 - 배포 대상 저장소: `https://github.com/dongjae-hub/dongjae-hub.github.io`
 - 예상 GitHub Pages 주소: `https://dongjae-hub.github.io`
-- 재배포 승인 필요 여부: 아니오
+- 재배포 승인 필요 여부: 예
 - [사람 확인 필요] 항목: 실제 브라우저 viewport/콘솔 수동 검수, Claude CLI 모델명 확인
+
+## Follow-up Fix Request
+
+- 추가 수정 요청: 모바일에서 Games 실행 시 지렁이가 보이지 않는 문제 수정, footer의 `© 2026 [사람 확인 필요]`를 `© 2026`으로 정리
+- 반영 결과: 모바일 캔버스 렌더링 호환성 보강, footer 문구 정리
+- 수정 파일: `game.js`, `index.html`, `tests/site.test.mjs`
+- 수정 후 로컬 검증: `cmd /c npm test` PASS, `cmd /c npm run build` PASS, 로컬 HTTP 200 PASS
+- 현재 상태: `DEPLOY_APPROVAL_REQUIRED`
+- 재배포 승인 필요 여부: 예

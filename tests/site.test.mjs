@@ -45,6 +45,7 @@ test("root site exposes the requested static structure", async () => {
   assert.ok(!html.match(/id=["']research["']/i));
   assert.ok(!html.match(/id=["']contact["']/i));
   assert.ok(!html.match(/Professional website/i));
+  assert.ok(!html.includes("[사람 확인 필요]"));
 });
 
 test("games area includes pause guidance and touch controls", async () => {
