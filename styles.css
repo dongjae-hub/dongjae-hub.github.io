@@ -184,6 +184,7 @@ main,
   text-decoration: none;
   font-weight: 700;
   background: rgba(255, 255, 255, 0.03);
+  touch-action: manipulation;
 }
 
 .button-primary {
@@ -197,6 +198,7 @@ main,
 }
 
 .hero-panel,
+.intro,
 .card-surface,
 .info-card,
 .timeline article,
@@ -210,6 +212,23 @@ main,
   display: grid;
   gap: 14px;
   padding: 18px;
+}
+
+.intro {
+  display: grid;
+  gap: 24px;
+}
+
+.intro .section-heading h1 {
+  font-size: clamp(2.6rem, 7vw, 5.2rem);
+  max-width: 12ch;
+}
+
+.intro-card {
+  display: grid;
+  gap: 12px;
+  padding: 24px;
+  max-width: 66ch;
 }
 
 .panel-card {
@@ -324,6 +343,47 @@ main,
   display: grid;
   gap: 16px;
   padding: 18px;
+  transition:
+    transform 140ms ease,
+    box-shadow 140ms ease,
+    border-color 140ms ease;
+}
+
+.game-stage[data-flash="true"] {
+  border-color: rgba(178, 255, 111, 0.7);
+  box-shadow: 0 0 0 1px rgba(178, 255, 111, 0.28), 0 20px 60px rgba(178, 255, 111, 0.12);
+}
+
+.game-stage[data-pickup="true"] {
+  transform: translateY(-1px) scale(1.01);
+  box-shadow: 0 0 0 1px rgba(143, 211, 255, 0.32), 0 24px 72px rgba(143, 211, 255, 0.16);
+}
+
+.game-stage[data-shake="true"] {
+  animation: stage-shake 360ms linear 1;
+}
+
+@keyframes stage-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  20% {
+    transform: translateX(-4px);
+  }
+
+  40% {
+    transform: translateX(4px);
+  }
+
+  60% {
+    transform: translateX(-3px);
+  }
+
+  80% {
+    transform: translateX(3px);
+  }
 }
 
 #snake-board {
@@ -362,6 +422,7 @@ main,
   font: inherit;
   font-weight: 800;
   cursor: pointer;
+  touch-action: manipulation;
 }
 
 .touch-controls button:hover,
@@ -379,6 +440,11 @@ main,
 
 .game-status {
   min-height: 44px;
+}
+
+#game-pause[disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 .contact-grid {
@@ -407,6 +473,7 @@ main,
 
 @media (max-width: 960px) {
   .hero,
+  .intro,
   .split-section,
   .games-layout {
     grid-template-columns: 1fr;
@@ -458,7 +525,8 @@ main,
     padding: 74px 0;
   }
 
-  .hero h1 {
+  .hero h1,
+  .intro .section-heading h1 {
     font-size: clamp(2.5rem, 14vw, 4.6rem);
   }
 

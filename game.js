@@ -12,6 +12,8 @@ const OPPOSITES = {
   left: "right",
 };
 
+const EMPTY_EFFECTS = () => ({ flashTicks: 0, pickupTicks: 0, shakeTicks: 0 });
+
 export function directionFromKey(key) {
   const normalized = typeof key === "string" ? key.toLowerCase() : "";
   const map = {
@@ -24,6 +26,7 @@ export function directionFromKey(key) {
     s: "down",
     a: "left",
   };
+
   return map[normalized] ?? null;
 }
 
@@ -40,12 +43,23 @@ function sameCell(a, b) {
   return a.x === b.x && a.y === b.y;
 }
 
-function occupiedCells(snake) {
-  return new Set(snake.map((cell) => `${cell.x}:${cell.y}`));
+function occupiedCells(snake, food, enemy) {
+  const occupied = new Set(snake.map((cell) => `${cell.x}:${cell.y}`));
+
+  if (food) occupied.add(`${food.x}:${food.y}`);
+  if (enemy) occupied.add(`${enemy.x}:${enemy.y}`);
+
+  return occupied;
 }
 
-export function placeFood(columns, rows, snake, random = Math.random) {
-  const occupied = occupiedCells(snake);
+function randomChoice(items, random) {
+  if (items.length === 0) return null;
+  const index = Math.floor(random() * items.length) % items.length;
+  return items[index];
+}
+
+export function placeFood(columns, rows, snake, enemy, random = Math.random) {
+  const occupied = occupiedCells(snake, null, enemy);
   const openCells = [];
 
   for (let y = 0; y < rows; y += 1) {
@@ -54,8 +68,44 @@ export function placeFood(columns, rows, snake, random = Math.random) {
     }
   }
 
-  if (openCells.length === 0) return null;
-  return openCells[Math.floor(random() * openCells.length) % openCells.length];
+  return randomChoice(openCells, random);
+}
+
+export function placeEnemy(columns, rows, snake, food, random = Math.random) {
+  const occupied = occupiedCells(snake, food, null);
+  const openCells = [];
+
+  for (let y = 0; y < rows; y += 1) {
+    for (let x = 0; x < columns; x += 1) {
+      if (!occupied.has(`${x}:${y}`)) openCells.push({ x, y });
+    }
+  }
+
+  return randomChoice(openCells, random);
+}
+
+function createEffects() {
+  return { ...EMPTY_EFFECTS() };
+}
+
+function cloneEffects(effects) {
+  return {
+    flashTicks: effects?.flashTicks ?? 0,
+    pickupTicks: effects?.pickupTicks ?? 0,
+    shakeTicks: effects?.shakeTicks ?? 0,
+  };
+}
+
+function decrementEffects(effects) {
+  return {
+    flashTicks: Math.max(0, (effects?.flashTicks ?? 0) - 1),
+    pickupTicks: Math.max(0, (effects?.pickupTicks ?? 0) - 1),
+    shakeTicks: Math.max(0, (effects?.shakeTicks ?? 0) - 1),
+  };
+}
+
+function isInside(columns, rows, cell) {
+  return cell.x >= 0 && cell.x < columns && cell.y >= 0 && cell.y < rows;
 }
 
 export function createGame({ columns = 20, rows = 20, random = Math.random } = {}) {
@@ -66,6 +116,8 @@ export function createGame({ columns = 20, rows = 20, random = Math.random } = {
     { x: centerX - 1, y: centerY },
     { x: centerX - 2, y: centerY },
   ];
+  const enemy = placeEnemy(columns, rows, snake, null, random);
+  const food = placeFood(columns, rows, snake, enemy, random);
 
   return {
     columns,
@@ -73,10 +125,12 @@ export function createGame({ columns = 20, rows = 20, random = Math.random } = {
     snake,
     direction: "right",
     queuedDirection: "right",
-    food: placeFood(columns, rows, snake, random),
+    food,
+    enemy,
     score: 0,
     bestScore: 0,
     status: "idle",
+    effects: createEffects(),
   };
 }
 
@@ -104,11 +158,50 @@ export function restartGame(game, random = Math.random) {
 export function queueDirection(game, direction) {
   if (!(direction in VECTORS)) return game;
 
-  const nextDirection = game.queuedDirection ?? game.direction;
-  if (direction === nextDirection) return game;
-  if (direction === OPPOSITES[game.direction]) return game;
+  const currentDirection = game.queuedDirection ?? game.direction;
+  if (direction === currentDirection) return game;
+  if (direction === OPPOSITES[currentDirection]) return game;
 
   return { ...game, queuedDirection: direction };
+}
+
+export function moveEnemy(game, random = Math.random) {
+  if (!game.enemy) return null;
+
+  const choices = Object.entries(VECTORS)
+    .map(([direction, vector]) => ({
+      direction,
+      cell: {
+        x: game.enemy.x + vector.x,
+        y: game.enemy.y + vector.y,
+      },
+    }))
+    .filter(({ cell }) => isInside(game.columns, game.rows, cell))
+    .filter(({ cell }) => !game.snake.some((segment) => sameCell(segment, cell)))
+    .filter(({ cell }) => !game.food || !sameCell(game.food, cell));
+
+  const next = randomChoice(choices, random);
+  return next?.cell ?? game.enemy;
+}
+
+function finishGame(game, effects) {
+  return {
+    ...game,
+    status: "over",
+    bestScore: Math.max(game.bestScore, game.score),
+    effects: {
+      ...effects,
+      shakeTicks: 1,
+    },
+  };
+}
+
+function awardPickupEffects(score, effects) {
+  return {
+    ...effects,
+    pickupTicks: 5,
+    flashTicks: score > 0 && score % 5 === 0 ? 6 : effects.flashTicks,
+  };
 }
 
 export function stepGame(game, random = Math.random) {
@@ -118,40 +211,47 @@ export function stepGame(game, random = Math.random) {
   const vector = VECTORS[direction];
   const head = game.snake[0];
   const nextHead = { x: head.x + vector.x, y: head.y + vector.y };
+  const effects = decrementEffects(cloneEffects(game.effects));
+
   const wallHit =
     nextHead.x < 0 ||
     nextHead.x >= game.columns ||
     nextHead.y < 0 ||
     nextHead.y >= game.rows;
 
-  if (wallHit) {
-    return {
-      ...game,
-      direction,
-      queuedDirection: direction,
-      status: "over",
-      bestScore: Math.max(game.bestScore, game.score),
-    };
+  const bodyToCheck = game.food && sameCell(nextHead, game.food) ? game.snake : game.snake.slice(0, -1);
+  const bodyHit = bodyToCheck.some((cell) => sameCell(cell, nextHead));
+  const enemyHit = game.enemy ? sameCell(nextHead, game.enemy) : false;
+
+  if (wallHit || bodyHit || enemyHit) {
+    return finishGame(
+      {
+        ...game,
+        direction,
+        queuedDirection: direction,
+      },
+      effects,
+    );
   }
 
   const ateFood = game.food && sameCell(nextHead, game.food);
-  const bodyToCheck = ateFood ? game.snake : game.snake.slice(0, -1);
+  const snake = [nextHead, ...game.snake];
 
-  if (bodyToCheck.some((cell) => sameCell(cell, nextHead))) {
-    return {
-      ...game,
-      direction,
-      queuedDirection: direction,
-      status: "over",
-      bestScore: Math.max(game.bestScore, game.score),
-    };
+  if (!ateFood) {
+    snake.pop();
   }
 
-  const snake = [nextHead, ...game.snake];
-  if (!ateFood) snake.pop();
-
   const score = game.score + (ateFood ? 1 : 0);
-  const food = ateFood ? placeFood(game.columns, game.rows, snake, random) : game.food;
+  const food = ateFood ? placeFood(game.columns, game.rows, snake, game.enemy, random) : game.food;
+  const enemyState = moveEnemy(
+    {
+      ...game,
+      snake,
+      food,
+      enemy: game.enemy,
+    },
+    random,
+  );
 
   return {
     ...game,
@@ -159,8 +259,10 @@ export function stepGame(game, random = Math.random) {
     direction,
     queuedDirection: direction,
     food,
+    enemy: enemyState,
     score,
     bestScore: Math.max(game.bestScore, score),
+    effects: ateFood ? awardPickupEffects(score, effects) : effects,
   };
 }
 
@@ -198,6 +300,14 @@ function drawBoard(context, state) {
     context.fill();
   }
 
+  if (state.enemy) {
+    const pad = Math.max(1.5, cell * 0.16);
+    context.fillStyle = "#ffcf6f";
+    context.beginPath();
+    context.roundRect(state.enemy.x * cell + pad, state.enemy.y * cell + pad, cell - pad * 2, cell - pad * 2, cell * 0.22);
+    context.fill();
+  }
+
   state.snake.forEach((segment, index) => {
     const pad = Math.max(1.5, cell * 0.12);
     context.fillStyle = index === 0 ? "#efffc8" : "#8fd3ff";
@@ -212,14 +322,16 @@ export function initSnakeGame(root = document) {
   if (window.__dongjaeSnakeMounted) return window.__dongjaeSnakeMounted;
 
   const board = root.querySelector("#snake-board");
+  const stage = root.querySelector(".game-stage");
   const scoreEl = root.querySelector("#game-score");
   const bestEl = root.querySelector("#game-best");
   const statusEl = root.querySelector("#game-status");
   const startButton = root.querySelector("#game-start");
+  const pauseButton = root.querySelector("#game-pause");
   const restartButton = root.querySelector("#game-restart");
   const directionButtons = root.querySelectorAll("[data-direction]");
 
-  if (!board || !scoreEl || !bestEl || !statusEl || !startButton || !restartButton) {
+  if (!board || !stage || !scoreEl || !bestEl || !statusEl || !startButton || !pauseButton || !restartButton) {
     return null;
   }
 
@@ -231,19 +343,20 @@ export function initSnakeGame(root = document) {
   const updateHud = () => {
     scoreEl.textContent = String(state.score).padStart(2, "0");
     bestEl.textContent = String(state.bestScore).padStart(2, "0");
-    if (state.status === "idle") {
-      startButton.textContent = "Start";
-    } else if (state.status === "running") {
-      startButton.textContent = "Pause";
-    } else if (state.status === "paused") {
-      startButton.textContent = "Resume";
-    } else {
-      startButton.textContent = "Play again";
-    }
+    startButton.textContent = state.status === "paused" ? "Resume" : state.status === "over" ? "Play again" : "Start";
+    pauseButton.textContent = state.status === "paused" ? "Resume" : "Pause";
+    pauseButton.disabled = state.status !== "running" && state.status !== "paused";
+    restartButton.textContent = "Restart";
   };
 
   const setStatus = (message) => {
     statusEl.textContent = message;
+  };
+
+  const syncEffects = () => {
+    stage.dataset.flash = String((state.effects?.flashTicks ?? 0) > 0);
+    stage.dataset.pickup = String((state.effects?.pickupTicks ?? 0) > 0);
+    stage.dataset.shake = String(state.status === "over" || (state.effects?.shakeTicks ?? 0) > 0);
   };
 
   const render = () => {
@@ -253,6 +366,7 @@ export function initSnakeGame(root = document) {
     board.height = size * ratio;
     context.setTransform(ratio, 0, 0, ratio, 0, 0);
     drawBoard(context, state);
+    syncEffects();
     updateHud();
   };
 
@@ -265,16 +379,30 @@ export function initSnakeGame(root = document) {
 
   const startTimer = () => {
     if (timerId !== null) return;
-    timerId = window.setInterval(tick, 120);
+    timerId = window.setInterval(tick, 100);
   };
 
-  const beginRunning = (message) => {
+  const startOrResume = (message, openingDirection = null) => {
+    if (state.status === "paused") {
+      state = startGame(state);
+      startTimer();
+      setStatus(message ?? "Game resumed.");
+      render();
+      board.focus();
+      return;
+    }
+
     if (state.status === "over" || state.status === "idle") {
       state = restartGame(state);
     }
+
+    if (openingDirection) {
+      state = queueDirection(state, openingDirection);
+    }
+
     state = startGame(state);
     startTimer();
-    setStatus(message);
+    setStatus(message ?? "Game running. Use arrow keys, WASD, swipe, or the direction buttons.");
     render();
     board.focus();
   };
@@ -288,7 +416,7 @@ export function initSnakeGame(root = document) {
     render();
   }
 
-  const toggleStart = () => {
+  const togglePause = () => {
     if (state.status === "running") {
       state = pauseGame(state);
       stopTimer();
@@ -298,14 +426,8 @@ export function initSnakeGame(root = document) {
     }
 
     if (state.status === "paused") {
-      state = startGame(state);
-      startTimer();
-      setStatus("Game resumed.");
-      render();
-      return;
+      startOrResume("Game resumed.");
     }
-
-    beginRunning("Game running. Use arrow keys, WASD, swipe, or the direction buttons.");
   };
 
   const restart = () => {
@@ -320,10 +442,12 @@ export function initSnakeGame(root = document) {
 
   const applyDirection = (direction) => {
     if (!direction) return;
-    state = queueDirection(state, direction);
-    if (state.status === "idle") {
-      beginRunning("Game running. Use arrow keys, WASD, swipe, or the direction buttons.");
+    if (state.status === "idle" || state.status === "over") {
+      startOrResume(undefined, direction);
+      return;
     }
+
+    state = queueDirection(state, direction);
     render();
   };
 
@@ -336,9 +460,9 @@ export function initSnakeGame(root = document) {
     }
 
     if (event.key === " " || event.key === "Spacebar") {
-      if (board.contains(document.activeElement) || document.activeElement === startButton || document.activeElement === restartButton) {
-        event.preventDefault();
-        toggleStart();
+      event.preventDefault();
+      if (state.status === "running" || state.status === "paused") {
+        togglePause();
       }
     }
   };
@@ -359,8 +483,13 @@ export function initSnakeGame(root = document) {
     swipeStart = null;
   };
 
-  startButton.addEventListener("click", toggleStart);
-  restartButton.addEventListener("click", restart);
+  const handleStartClick = () => startOrResume();
+  const handlePauseClick = () => togglePause();
+  const handleRestartClick = () => restart();
+
+  startButton.addEventListener("click", handleStartClick);
+  pauseButton.addEventListener("click", handlePauseClick);
+  restartButton.addEventListener("click", handleRestartClick);
 
   directionButtons.forEach((button) => {
     button.addEventListener("click", () => applyDirection(button.dataset.direction));
@@ -383,8 +512,9 @@ export function initSnakeGame(root = document) {
       board.removeEventListener("pointerdown", onPointerDown);
       board.removeEventListener("pointerup", onPointerUp);
       board.removeEventListener("pointercancel", onPointerCancel);
-      startButton.removeEventListener("click", toggleStart);
-      restartButton.removeEventListener("click", restart);
+      startButton.removeEventListener("click", handleStartClick);
+      pauseButton.removeEventListener("click", handlePauseClick);
+      restartButton.removeEventListener("click", handleRestartClick);
       directionButtons.forEach((button) => {
         button.replaceWith(button.cloneNode(true));
       });
