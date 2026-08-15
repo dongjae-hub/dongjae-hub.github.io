@@ -16,6 +16,7 @@ const customResult = document.querySelector("#custom-result");
 const customError = document.querySelector("#custom-error");
 let history = [];
 let customPick = null;
+let activeFilter = null;
 
 function balls(numbers, extraClass = "") {
   return numbers.map((number) => `<span class="ball ${extraClass}">${number}</span>`).join("");
@@ -59,7 +60,7 @@ function renderSummary() {
       return;
     }
     element.classList.add("won");
-    element.innerHTML = `<strong>${wins.length}회 당첨</strong> · 최고 ${best}등`;
+    element.innerHTML = `<button type="button" class="result-link" data-pick-filter="${index}"><strong>${wins.length}회 당첨</strong> · 최고 ${best}등</button>`;
   });
 }
 
@@ -69,7 +70,7 @@ function renderCustomResult() {
     return;
   }
   const { wins, best } = statsFor(customPick);
-  const summary = wins.length ? `<strong>${wins.length}회 당첨</strong> · 최고 ${best}등` : "당첨 기록 없음";
+  const summary = wins.length ? `<button type="button" class="result-link" data-custom-filter><strong>${wins.length}회 당첨</strong> · 최고 ${best}등</button>` : "당첨 기록 없음";
   customResult.innerHTML = `<div class="custom-result-heading"><span class="pick-label">조회한 조합</span><span class="result ${wins.length ? "won" : ""}">${summary}</span></div><div class="balls">${balls(customPick)}</div>`;
 }
 
@@ -82,7 +83,8 @@ function renderNumberFrequency() {
 
 function renderHistory() {
   const query = searchInput.value.trim();
-  const rows = query ? history.filter((draw) => String(draw.draw_no).includes(query)) : history;
+  const filtered = activeFilter ? history.filter((draw) => matchRank(activeFilter.pick, draw) > 0) : history;
+  const rows = query ? filtered.filter((draw) => String(draw.draw_no).includes(query)) : filtered;
   historyBody.innerHTML = rows.slice().reverse().map((draw) => {
     const results = PICKS.map((pick, index) => {
       const rank = matchRank(pick, draw);
@@ -99,8 +101,29 @@ function renderHistory() {
       <td><div class="row-results">${results}${custom}</div></td>
     </tr>`;
   }).join("");
-  status.textContent = `${rows.length.toLocaleString("ko-KR")}개 회차 표시 · 데이터 기준 ${history.at(-1)?.draw_no ?? "-"}회`;
+  const filterLabel = activeFilter ? ` · ${activeFilter.label} 당첨 회차만 필터링` : "";
+  status.innerHTML = `${rows.length.toLocaleString("ko-KR")}개 회차 표시 · 데이터 기준 ${history.at(-1)?.draw_no ?? "-"}회${filterLabel}${activeFilter ? ' <button type="button" class="clear-filter" data-clear-filter>전체 회차 보기</button>' : ""}`;
 }
+
+document.querySelector("#picks").addEventListener("click", (event) => {
+  const pickButton = event.target.closest("[data-pick-filter]");
+  const customButton = event.target.closest("[data-custom-filter]");
+  if (!pickButton && !customButton) return;
+  if (pickButton) {
+    const index = Number(pickButton.dataset.pickFilter);
+    activeFilter = { pick: PICKS[index], label: `내 번호 ${index + 1}` };
+  } else if (customPick) {
+    activeFilter = { pick: customPick, label: "조회한 조합" };
+  }
+  renderHistory();
+  document.querySelector("#history").scrollIntoView({ behavior: "smooth" });
+});
+
+status.addEventListener("click", (event) => {
+  if (!event.target.closest("[data-clear-filter]")) return;
+  activeFilter = null;
+  renderHistory();
+});
 
 customForm.addEventListener("submit", (event) => {
   event.preventDefault();
