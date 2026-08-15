@@ -36,6 +36,24 @@
           <p class="muted">보너스 번호를 포함한 등수 판정</p>
         </div>
         <div id="pick-cards" class="pick-grid" aria-live="polite"></div>
+        <form id="custom-form" class="custom-form" novalidate>
+          <div>
+            <p class="eyebrow">CUSTOM PICK</p>
+            <h3>나만의 번호 직접 조회</h3>
+            <p class="muted">1~45번 중 중복 없이 6개를 입력하세요.</p>
+          </div>
+          <div class="number-inputs" aria-label="조회할 번호 6개">
+            <input name="number" type="number" min="1" max="45" inputmode="numeric" aria-label="첫 번째 번호" required>
+            <input name="number" type="number" min="1" max="45" inputmode="numeric" aria-label="두 번째 번호" required>
+            <input name="number" type="number" min="1" max="45" inputmode="numeric" aria-label="세 번째 번호" required>
+            <input name="number" type="number" min="1" max="45" inputmode="numeric" aria-label="네 번째 번호" required>
+            <input name="number" type="number" min="1" max="45" inputmode="numeric" aria-label="다섯 번째 번호" required>
+            <input name="number" type="number" min="1" max="45" inputmode="numeric" aria-label="여섯 번째 번호" required>
+          </div>
+          <button class="primary-button" type="submit">역대 당첨 조회</button>
+          <p id="custom-error" class="form-error" role="alert"></p>
+        </form>
+        <div id="custom-result" class="custom-result" aria-live="polite"></div>
       </section>
 
       <section id="history" class="section history-section" aria-labelledby="history-title">
