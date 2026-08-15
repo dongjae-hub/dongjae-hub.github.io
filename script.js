@@ -95,7 +95,7 @@ function renderNumberFrequency() {
 function renderHistory() {
   const query = searchInput.value.trim();
   const filtered = activeFilter ? history.filter((draw) => matchRank(activeFilter.pick, draw) > 0) : history;
-  const rows = query ? filtered.filter((draw) => String(draw.draw_no).includes(query)) : filtered;
+  const rows = query ? filtered.filter((draw) => String(draw.draw_no) === query) : filtered;
   historyBody.innerHTML = rows.slice().reverse().map((draw) => {
     const results = PICKS.map((pick, index) => {
       const rank = matchRank(pick, draw);

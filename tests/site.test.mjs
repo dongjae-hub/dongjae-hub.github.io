@@ -29,6 +29,7 @@ test("lotto page has static assets and the five requested picks", async () => {
   assert.match(script, /data-clear-filter/);
   assert.match(script, /function winningBalls/);
   assert.match(script, /matched-ball/);
+  assert.match(script, /String\(draw\.draw_no\) === query/);
   assert.match(css, /\.frequency-table \{ display: grid; grid-template-columns: repeat\(10/);
   assert.match(html, /href="#frequency"/i);
   assert.match(script, /counts\.sort\(\(a, b\) => b\.count - a\.count/);
