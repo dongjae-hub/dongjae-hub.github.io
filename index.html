@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="내 로또 번호 조합 5개를 역대 로또 6/45 당첨 번호와 비교합니다.">
+    <title>로또 번호 당첨 확인</title>
+    <link rel="stylesheet" href="styles.css">
+    <script type="module" src="script.js"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="#top">Lotto Match</a>
+        <nav aria-label="주요 메뉴">
+          <a href="#picks">내 번호</a>
+          <a href="#history">역대 당첨 번호</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero container">
+        <p class="eyebrow">LOTTO 6/45</p>
+        <h1>내 번호 조합은<br><span>당첨된 적이 있을까?</span></h1>
+        <p class="intro">저장한 5개 조합을 역대 1등 당첨 번호와 대조하고, 회차별 일치 결과를 한눈에 확인하세요.</p>
+        <a class="primary-button" href="#picks">번호 확인하기 <span aria-hidden="true">↓</span></a>
+      </section>
+
+      <section id="picks" class="section container" aria-labelledby="picks-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">MY PICKS</p>
+            <h2 id="picks-title">나만의 번호 조합</h2>
+          </div>
+          <p class="muted">보너스 번호를 포함한 등수 판정</p>
+        </div>
+        <div id="pick-cards" class="pick-grid" aria-live="polite"></div>
+      </section>
+
+      <section id="history" class="section history-section" aria-labelledby="history-title">
+        <div class="container">
+          <div class="section-heading history-heading">
+            <div>
+              <p class="eyebrow">DRAW HISTORY</p>
+              <h2 id="history-title">역대 당첨 번호</h2>
+            </div>
+            <div class="controls">
+              <label for="draw-search">회차 검색</label>
+              <input id="draw-search" type="search" inputmode="numeric" placeholder="예: 1236" autocomplete="off">
+            </div>
+          </div>
+          <p id="data-status" class="status" role="status">당첨 데이터를 불러오는 중입니다…</p>
+          <div class="table-wrap">
+            <table>
+              <caption class="sr-only">회차별 로또 당첨 번호와 내 조합의 당첨 결과</caption>
+              <thead>
+                <tr>
+                  <th scope="col">회차</th>
+                  <th scope="col">추첨일</th>
+                  <th scope="col">당첨 번호</th>
+                  <th scope="col">보너스</th>
+                  <th scope="col">내 조합 결과</th>
+                </tr>
+              </thead>
+              <tbody id="history-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <span>© <span data-year></span> Lotto Match</span>
+        <span>데이터 출처: <a href="https://papaya5rhw1984.github.io/lotto-data/" target="_blank" rel="noreferrer">lotto-data</a></span>
+      </div>
+    </footer>
+  </body>
+</html>
