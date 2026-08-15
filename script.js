@@ -14,9 +14,12 @@ const status = document.querySelector("#data-status");
 const customForm = document.querySelector("#custom-form");
 const customResult = document.querySelector("#custom-result");
 const customError = document.querySelector("#custom-error");
+const customNumberGrid = document.querySelector("#custom-number-grid");
+const customSelectionStatus = document.querySelector("#custom-selection-status");
 let history = [];
 let customPick = null;
 let activeFilter = null;
+let customSelection = [];
 
 function balls(numbers, extraClass = "") {
   return numbers.map((number) => `<span class="ball ${extraClass}">${number}</span>`).join("");
@@ -59,6 +62,15 @@ function renderPickCards() {
     <div class="balls" aria-label="${pick.join(", ")}">${balls(pick)}</div>
     <span class="result" data-pick-result="${index}">데이터 확인 중…</span>
   </article>`).join("");
+}
+
+function renderCustomNumberGrid() {
+  customNumberGrid.innerHTML = Array.from({ length: 45 }, (_, index) => {
+    const number = index + 1;
+    const selected = customSelection.includes(number);
+    return `<button type="button" class="number-choice ${selected ? "selected" : ""}" data-number="${number}" aria-pressed="${selected}">${number}</button>`;
+  }).join("");
+  customSelectionStatus.textContent = `${customSelection.length}/6 선택`;
 }
 
 function renderSummary() {
@@ -139,7 +151,7 @@ status.addEventListener("click", (event) => {
 customForm.addEventListener("submit", (event) => {
   event.preventDefault();
   event.stopPropagation();
-  const values = [...customForm.querySelectorAll("input[name=number]")].map((input) => Number(input.value));
+  const values = [...customSelection];
   const valid = values.length === 6 && values.every((number) => Number.isInteger(number) && number >= 1 && number <= 45) && new Set(values).size === 6;
   if (!valid) {
     customError.textContent = "1~45 사이의 서로 다른 번호 6개를 입력해 주세요.";
@@ -149,6 +161,22 @@ customForm.addEventListener("submit", (event) => {
   customPick = values.sort((a, b) => a - b);
   renderCustomResult();
   renderHistory();
+});
+
+customNumberGrid.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-number]");
+  if (!button) return;
+  const number = Number(button.dataset.number);
+  if (customSelection.includes(number)) {
+    customSelection = customSelection.filter((value) => value !== number);
+  } else if (customSelection.length < 6) {
+    customSelection = [...customSelection, number].sort((a, b) => a - b);
+  } else {
+    customError.textContent = "번호는 최대 6개까지 선택할 수 있습니다.";
+    return;
+  }
+  customError.textContent = "";
+  renderCustomNumberGrid();
 });
 
 async function loadHistory() {
@@ -167,6 +195,7 @@ async function loadHistory() {
 }
 
 renderPickCards();
+renderCustomNumberGrid();
 searchInput.addEventListener("input", renderHistory);
 document.querySelector("[data-year]").textContent = new Date().getFullYear();
 loadHistory();
