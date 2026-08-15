@@ -24,8 +24,7 @@ test("lotto page has static assets and the five requested picks", async () => {
   assert.match(script, /1, 3, 4, 9, 12, 45/);
   assert.match(script, /function matchRank/);
   assert.match(script, /function renderNumberFrequency/);
-  assert.match(script, /customForm\.addEventListener\("submit"/);
-  assert.match(script, /new Set\(values\)\.size === 6/);
+  assert.match(script, /customSelection\.length === 6/);
   assert.match(script, /data-number/);
   assert.match(script, /data-pick-filter/);
   assert.match(script, /data-clear-filter/);

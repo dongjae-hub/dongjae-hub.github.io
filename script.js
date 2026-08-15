@@ -148,21 +148,6 @@ status.addEventListener("click", (event) => {
   renderHistory();
 });
 
-customForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-  event.stopPropagation();
-  const values = [...customSelection];
-  const valid = values.length === 6 && values.every((number) => Number.isInteger(number) && number >= 1 && number <= 45) && new Set(values).size === 6;
-  if (!valid) {
-    customError.textContent = "1~45 사이의 서로 다른 번호 6개를 입력해 주세요.";
-    return;
-  }
-  customError.textContent = "";
-  customPick = values.sort((a, b) => a - b);
-  renderCustomResult();
-  renderHistory();
-});
-
 customNumberGrid.addEventListener("click", (event) => {
   const button = event.target.closest("[data-number]");
   if (!button) return;
@@ -177,6 +162,14 @@ customNumberGrid.addEventListener("click", (event) => {
   }
   customError.textContent = "";
   renderCustomNumberGrid();
+  if (customSelection.length === 6) {
+    customPick = [...customSelection];
+  } else {
+    customPick = null;
+    if (activeFilter?.label === "조회한 조합") activeFilter = null;
+  }
+  renderCustomResult();
+  renderHistory();
 });
 
 async function loadHistory() {
