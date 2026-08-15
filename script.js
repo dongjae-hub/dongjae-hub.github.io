@@ -82,7 +82,7 @@ function renderNumberFrequency() {
   const counts = Array.from({ length: 45 }, (_, index) => ({ number: index + 1, count: 0 }));
   history.forEach((draw) => draw.numbers.forEach((number) => { counts[number - 1].count += 1; }));
   counts.sort((a, b) => b.count - a.count || a.number - b.number);
-  frequencyList.innerHTML = counts.map(({ number, count }) => `<li><span>${number}번</span><span class="frequency-count">${count}회</span></li>`).join("");
+  frequencyList.innerHTML = counts.map(({ number, count }, index) => `<div class="frequency-cell" title="${index + 1}위"><span>${number}번</span><strong>${count}회</strong></div>`).join("");
 }
 
 function renderHistory() {

@@ -15,6 +15,7 @@
         <nav aria-label="주요 메뉴">
           <a href="#picks">내 번호</a>
           <a href="#history">역대 당첨 번호</a>
+          <a href="#frequency">번호 빈도</a>
         </nav>
       </div>
     </header>
@@ -85,13 +86,20 @@
                 <tbody id="history-body"></tbody>
               </table>
             </div>
-            <aside class="frequency-panel" aria-labelledby="frequency-title">
-              <p class="eyebrow">NUMBER FREQUENCY</p>
-              <h3 id="frequency-title">번호별 출현 횟수</h3>
-              <p class="frequency-note">본번호 6개 기준 · 내림차순</p>
-              <ol id="frequency-list" class="frequency-list" aria-live="polite"></ol>
-            </aside>
           </div>
+        </div>
+      </section>
+
+      <section id="frequency" class="section frequency-section" aria-labelledby="frequency-title">
+        <div class="container">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">NUMBER FREQUENCY</p>
+              <h2 id="frequency-title">번호별 출현 횟수</h2>
+            </div>
+            <p class="muted">본번호 6개 기준 · 출현 횟수 내림차순</p>
+          </div>
+          <div id="frequency-list" class="frequency-table" aria-live="polite"></div>
         </div>
       </section>
     </main>
