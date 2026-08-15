@@ -36,6 +36,10 @@ function rankLabel(rank) {
   return rank ? `${rank}등 당첨` : "낙첨";
 }
 
+function rankClass(rank) {
+  return rank ? `rank-${rank}` : "";
+}
+
 function statsFor(pick) {
   const wins = history.map((draw) => matchRank(pick, draw)).filter(Boolean);
   return { wins, best: wins.length ? Math.min(...wins) : 0 };
@@ -59,7 +63,7 @@ function renderSummary() {
       element.textContent = "당첨 기록 없음";
       return;
     }
-    element.classList.add("won");
+    element.classList.add("won", rankClass(best));
     element.innerHTML = `<button type="button" class="result-link" data-pick-filter="${index}"><strong>${wins.length}회 당첨</strong> · 최고 ${best}등</button>`;
   });
 }
@@ -71,7 +75,7 @@ function renderCustomResult() {
   }
   const { wins, best } = statsFor(customPick);
   const summary = wins.length ? `<button type="button" class="result-link" data-custom-filter><strong>${wins.length}회 당첨</strong> · 최고 ${best}등</button>` : "당첨 기록 없음";
-  customResult.innerHTML = `<div class="custom-result-heading"><span class="pick-label">조회한 조합</span><span class="result ${wins.length ? "won" : ""}">${summary}</span></div><div class="balls">${balls(customPick)}</div>`;
+  customResult.innerHTML = `<div class="custom-result-heading"><span class="pick-label">조회한 조합</span><span class="result ${wins.length ? `won ${rankClass(best)}` : ""}">${summary}</span></div><div class="balls">${balls(customPick)}</div>`;
 }
 
 function renderNumberFrequency() {
@@ -88,10 +92,10 @@ function renderHistory() {
   historyBody.innerHTML = rows.slice().reverse().map((draw) => {
     const results = PICKS.map((pick, index) => {
       const rank = matchRank(pick, draw);
-      return `<span class="mini-result ${rank ? "won" : ""}" title="내 번호 ${index + 1}">${index + 1}번 ${rankLabel(rank)}</span>`;
+      return `<span class="mini-result ${rank ? `won ${rankClass(rank)}` : ""}" title="내 번호 ${index + 1}">${index + 1}번 ${rankLabel(rank)}</span>`;
     }).join("");
     const customRank = customPick ? matchRank(customPick, draw) : 0;
-    const custom = customPick ? `<span class="mini-result ${customRank ? "won" : ""}" title="조회한 조합">입력 ${rankLabel(customRank)}</span>` : "";
+    const custom = customPick ? `<span class="mini-result ${customRank ? `won ${rankClass(customRank)}` : ""}" title="조회한 조합">입력 ${rankLabel(customRank)}</span>` : "";
     const date = draw.date ? new Date(draw.date).toLocaleDateString("ko-KR") : "-";
     return `<tr>
       <th scope="row">${draw.draw_no}회</th>
