@@ -70,6 +70,15 @@ function renderCustomNumberGrid() {
     const selected = customSelection.includes(number);
     return `<button type="button" class="number-choice ${selected ? "selected" : ""}" data-number="${number}" aria-pressed="${selected}">${number}</button>`;
   }).join("");
+  updateCustomNumberGrid();
+}
+
+function updateCustomNumberGrid() {
+  customNumberGrid.querySelectorAll("[data-number]").forEach((button) => {
+    const selected = customSelection.includes(Number(button.dataset.number));
+    button.classList.toggle("selected", selected);
+    button.setAttribute("aria-pressed", String(selected));
+  });
   customSelectionStatus.textContent = `${customSelection.length}/6 선택`;
 }
 
@@ -161,15 +170,17 @@ customNumberGrid.addEventListener("click", (event) => {
     return;
   }
   customError.textContent = "";
-  renderCustomNumberGrid();
+  updateCustomNumberGrid();
   if (customSelection.length === 6) {
     customPick = [...customSelection];
+    renderCustomResult();
+    renderHistory();
   } else {
     customPick = null;
     if (activeFilter?.label === "조회한 조합") activeFilter = null;
+    renderCustomResult();
+    if (activeFilter === null) renderHistory();
   }
-  renderCustomResult();
-  renderHistory();
 });
 
 async function loadHistory() {
