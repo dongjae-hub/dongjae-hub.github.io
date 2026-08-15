@@ -40,6 +40,13 @@ function rankClass(rank) {
   return rank ? `rank-${rank}` : "";
 }
 
+function winningBalls(draw) {
+  return draw.numbers.map((number) => {
+    const matched = activeFilter?.pick.includes(number) ? " matched-ball" : "";
+    return `<span class="ball${matched}">${number}</span>`;
+  }).join("");
+}
+
 function statsFor(pick) {
   const wins = history.map((draw) => matchRank(pick, draw)).filter(Boolean);
   return { wins, best: wins.length ? Math.min(...wins) : 0 };
@@ -100,7 +107,7 @@ function renderHistory() {
     return `<tr>
       <th scope="row">${draw.draw_no}회</th>
       <td>${date}</td>
-      <td><div class="winning-balls">${balls(draw.numbers)}</div></td>
+      <td><div class="winning-balls">${winningBalls(draw)}</div></td>
       <td><span class="bonus">+ ${draw.bonus_no}</span></td>
       <td><div class="row-results">${results}${custom}</div></td>
     </tr>`;
