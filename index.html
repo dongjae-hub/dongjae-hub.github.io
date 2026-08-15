@@ -51,20 +51,28 @@
             </div>
           </div>
           <p id="data-status" class="status" role="status">당첨 데이터를 불러오는 중입니다…</p>
-          <div class="table-wrap">
-            <table>
-              <caption class="sr-only">회차별 로또 당첨 번호와 내 조합의 당첨 결과</caption>
-              <thead>
-                <tr>
-                  <th scope="col">회차</th>
-                  <th scope="col">추첨일</th>
-                  <th scope="col">당첨 번호</th>
-                  <th scope="col">보너스</th>
-                  <th scope="col">내 조합 결과</th>
-                </tr>
-              </thead>
-              <tbody id="history-body"></tbody>
-            </table>
+          <div class="history-layout">
+            <div class="table-wrap">
+              <table>
+                <caption class="sr-only">회차별 로또 당첨 번호와 내 조합의 당첨 결과</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">회차</th>
+                    <th scope="col">추첨일</th>
+                    <th scope="col">당첨 번호</th>
+                    <th scope="col">보너스</th>
+                    <th scope="col">내 조합 결과</th>
+                  </tr>
+                </thead>
+                <tbody id="history-body"></tbody>
+              </table>
+            </div>
+            <aside class="frequency-panel" aria-labelledby="frequency-title">
+              <p class="eyebrow">NUMBER FREQUENCY</p>
+              <h3 id="frequency-title">번호별 출현 횟수</h3>
+              <p class="frequency-note">본번호 6개 기준 · 내림차순</p>
+              <ol id="frequency-list" class="frequency-list" aria-live="polite"></ol>
+            </aside>
           </div>
         </div>
       </section>
