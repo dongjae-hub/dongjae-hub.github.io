@@ -104,6 +104,7 @@ function renderHistory() {
 
 customForm.addEventListener("submit", (event) => {
   event.preventDefault();
+  event.stopPropagation();
   const values = [...customForm.querySelectorAll("input[name=number]")].map((input) => Number(input.value));
   const valid = values.length === 6 && values.every((number) => Number.isInteger(number) && number >= 1 && number <= 45) && new Set(values).size === 6;
   if (!valid) {
