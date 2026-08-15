@@ -10,7 +10,7 @@ test("lotto page has static assets and the five requested picks", async () => {
     readFile(new URL("../data/lotto-history.json", import.meta.url), "utf8"),
   ]);
   assert.match(html, /name="viewport"/i);
-  assert.match(html, /href="styles\.css"/i);
+  assert.match(html, /href="styles\.css(?:\?[^"']*)?"/i);
   assert.match(html, /src="script\.js(?:\?[^"']*)?"/i);
   assert.match(html, /id="picks"/i);
   assert.match(html, /id="history"/i);

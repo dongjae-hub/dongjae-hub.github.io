@@ -11,7 +11,6 @@ const historyBody = document.querySelector("#history-body");
 const frequencyList = document.querySelector("#frequency-list");
 const searchInput = document.querySelector("#draw-search");
 const status = document.querySelector("#data-status");
-const customForm = document.querySelector("#custom-form");
 const customResult = document.querySelector("#custom-result");
 const customError = document.querySelector("#custom-error");
 const customNumberGrid = document.querySelector("#custom-number-grid");
@@ -74,11 +73,6 @@ function renderCustomNumberGrid() {
 }
 
 function updateCustomNumberGrid() {
-  customNumberGrid.querySelectorAll("[data-number]").forEach((button) => {
-    const selected = customSelection.includes(Number(button.dataset.number));
-    button.classList.toggle("selected", selected);
-    button.setAttribute("aria-pressed", String(selected));
-  });
   customSelectionStatus.textContent = `${customSelection.length}/6 선택`;
 }
 
@@ -170,6 +164,9 @@ customNumberGrid.addEventListener("click", (event) => {
     return;
   }
   customError.textContent = "";
+  const selected = customSelection.includes(number);
+  button.classList.toggle("selected", selected);
+  button.setAttribute("aria-pressed", String(selected));
   updateCustomNumberGrid();
   if (customSelection.length === 6) {
     customPick = [...customSelection];
