@@ -15,10 +15,15 @@ const customResult = document.querySelector("#custom-result");
 const customError = document.querySelector("#custom-error");
 const customNumberGrid = document.querySelector("#custom-number-grid");
 const customSelectionStatus = document.querySelector("#custom-selection-status");
+const DATA_SOURCES = [
+  "https://papaya5rhw1984.github.io/lotto-data/all.json",
+  "data/lotto-history.json",
+];
 let history = [];
 let customPick = null;
 let activeFilter = null;
 let customSelection = [];
+let dataSource = "로컬 백업";
 
 function balls(numbers, extraClass = "") {
   return numbers.map((number) => `<span class="ball ${extraClass}">${number}</span>`).join("");
@@ -128,7 +133,7 @@ function renderHistory() {
     </tr>`;
   }).join("");
   const filterLabel = activeFilter ? ` · ${activeFilter.label} 당첨 회차만 필터링` : "";
-  status.innerHTML = `${rows.length.toLocaleString("ko-KR")}개 회차 표시 · 데이터 기준 ${history.at(-1)?.draw_no ?? "-"}회${filterLabel}${activeFilter ? ' <button type="button" class="clear-filter" data-clear-filter>전체 회차 보기</button>' : ""}`;
+  status.innerHTML = `${rows.length.toLocaleString("ko-KR")}개 회차 표시 · 데이터 기준 ${history.at(-1)?.draw_no ?? "-"}회 · ${dataSource}${filterLabel}${activeFilter ? ' <button type="button" class="clear-filter" data-clear-filter>전체 회차 보기</button>' : ""}`;
 }
 
 document.querySelector("#picks").addEventListener("click", (event) => {
@@ -181,18 +186,22 @@ customNumberGrid.addEventListener("click", (event) => {
 });
 
 async function loadHistory() {
-  try {
-    const response = await fetch("data/lotto-history.json");
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    history = await response.json();
-    renderSummary();
-    renderCustomResult();
-    renderNumberFrequency();
-    renderHistory();
-  } catch (error) {
-    status.textContent = "당첨 데이터를 불러오지 못했습니다. 새로고침 후 다시 시도해 주세요.";
-    console.error("Lotto history load failed:", error);
+  for (const [index, source] of DATA_SOURCES.entries()) {
+    try {
+      const response = await fetch(source, { cache: "no-store" });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      history = await response.json();
+      dataSource = index === 0 ? "최신 온라인 데이터" : "로컬 백업";
+      renderSummary();
+      renderCustomResult();
+      renderNumberFrequency();
+      renderHistory();
+      return;
+    } catch (error) {
+      console.warn(`Lotto history source unavailable: ${source}`, error);
+    }
   }
+  status.textContent = "당첨 데이터를 불러오지 못했습니다. 새로고침 후 다시 시도해 주세요.";
 }
 
 renderPickCards();

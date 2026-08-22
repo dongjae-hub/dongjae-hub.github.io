@@ -36,6 +36,8 @@ test("lotto page has static assets and the five requested picks", async () => {
   assert.match(html, /href="#frequency"/i);
   assert.match(script, /counts\.sort\(\(a, b\) => b\.count - a\.count/);
   assert.match(script, /data\/lotto-history\.json/);
+  assert.match(script, /papaya5rhw1984\.github\.io\/lotto-data\/all\.json/);
+  assert.match(script, /cache: "no-store"/);
   assert.match(css, /@media \(max-width: 620px\)/);
   const draws = JSON.parse(data);
   assert.ok(draws.length > 1000);
